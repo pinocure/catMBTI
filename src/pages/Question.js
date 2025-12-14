@@ -1,16 +1,43 @@
-import react from "react";
+import React from "react";
 import styled from 'styled-components';
 import {ProgressBar, Button} from 'react-bootstrap';
 import { QuestionData } from "../assets/data/questiondata";
+import { useNavigate } from "react-router-dom";
 
 const Question = () => {
+    const [questionNo, setQuestionNo] = React.useState(0);
+    const [totalScore, setTotalScore] = React.useState([
+        {id: "EI", score: 0},
+        {id: "SN", score: 0},
+        {id: "TF", score: 0},
+        {id: "JP", score: 0},
+    ]);
+    const navigate = useNavigate();
+
+    console.log('questionNo', questionNo);
+
+    const handleClickButton = (no, type) => {
+        const newScore = totalScore.map((s) => 
+            s.id === type ? {id: s.id, score: s.score + no} : s
+        );
+
+        setTotalScore(newScore);
+
+        if (QuestionData.length !== questionNo + 1) {
+            setQuestionNo(questionNo + 1);
+        } else {
+            navigate("/result");
+        }
+
+    } 
+
     return (
         <Wrapper>
-            <ProgressBar striped variant="danger" now={80} style={{marginTop: '20px'}} />
-            <Title>{QuestionData[0].title}</Title>
+            <ProgressBar striped variant="danger" now={(questionNo / QuestionData.length) * 100} style={{marginTop: '20px'}} />
+            <Title>{QuestionData[questionNo].title}</Title>
             <ButtonGroup>
-                <Button style={{width: "40%", minHeight: "200px", fontSize: "15pt"}}>{QuestionData[0].answera}</Button>
-                <Button style={{width: "40%", minHeight: "200px", fontSize: "15pt", marginLeft: "20px"}}>{QuestionData[0].answerb}</Button>
+                <Button onClick={() => handleClickButton(1, QuestionData[questionNo].type)} style={{width: "40%", minHeight: "200px", fontSize: "15pt"}}>{QuestionData[questionNo].answera}</Button>
+                <Button onClick={() => handleClickButton(0, QuestionData[questionNo].type)} style={{width: "40%", minHeight: "200px", fontSize: "15pt", marginLeft: "20px"}}>{QuestionData[questionNo].answerb}</Button>
             </ButtonGroup>
         </Wrapper>
     )
@@ -26,6 +53,9 @@ const Wrapper = styled.div`
 const Title = styled.div`
     font-size: 40pt;
     font-family: "Pretendard-Regular";
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
 `
 
 const ButtonGroup = styled.div`
